@@ -1,0 +1,161 @@
+{
+  "total_original": 47,
+  "kept_count": 35,
+  "pruned_count": 12,
+  "kept": [
+    [
+      "SPDD",
+      "Spec-Driven Development protocol."
+    ],
+    [
+      "accessibility-compliance-accessibility-audit",
+      "Auditorías de accesibilidad web (a11y) y WCAG."
+    ],
+    [
+      "accesslint-audit",
+      "Inspección de accesibilidad en elementos HTML5."
+    ],
+    [
+      "accesslint-diff",
+      "Detección de regresiones de accesibilidad."
+    ],
+    [
+      "accesslint-scan",
+      "Escaneo automático de estándares W3C/WCAG."
+    ],
+    [
+      "clean-code",
+      "Principios SOLID, DRY y legibilidad en código cliente."
+    ],
+    [
+      "clean-code-guard",
+      "Guardias de calidad de código y prevención de deuda técnica."
+    ],
+    [
+      "code-simplification",
+      "Simplificación de lógica de maquetado y JavaScript."
+    ],
+    [
+      "code-simplifier",
+      "Refactorización limpia de componentes."
+    ],
+    [
+      "design-system",
+      "Sistemas de diseño, variables de color y tokens visuales."
+    ],
+    [
+      "design-ux",
+      "Diseño centrado en el usuario y accesibilidad."
+    ],
+    [
+      "fixing-accessibility",
+      "Corrección de problemas de contraste y navegación por teclado."
+    ],
+    [
+      "frontend-design",
+      "Diseño y estructura visual de interfaces web."
+    ],
+    [
+      "frontend-developer",
+      "Desarrollo de interfaces cliente con estándares modernos."
+    ],
+    [
+      "frontend-ui-engineering",
+      "Ingeniería de interfaz de usuario para aplicaciones web."
+    ],
+    [
+      "javascript-mastery",
+      "Dinamismo y manipulación DOM en JavaScript nativo."
+    ],
+    [
+      "javascript-pro",
+      "Patrones avanzados y buenas prácticas en JS cliente."
+    ],
+    [
+      "javascript-testing-patterns",
+      "Patrones de prueba para lógica en JavaScript."
+    ],
+    [
+      "source-driven-development",
+      "Metodología de desarrollo guiado por código fuente."
+    ],
+    [
+      "spec-driven-development",
+      "Metodología Spec-Driven Development (SDD: Gentleman-Programming / gentle-ai)."
+    ],
+    [
+      "spec-driven-loop",
+      "Ciclos de desarrollo guiados por especificaciones (SDD)."
+    ],
+    [
+      "tailwind-design-system",
+      "Maquetado, tokens y componentes con TailwindCSS v3."
+    ],
+    [
+      "tailwind-patterns",
+      "Patrones de maquetado y clases de utilidad TailwindCSS."
+    ],
+    [
+      "ui-a11y",
+      "Componentes UI accesibles y atributos ARIA."
+    ],
+    [
+      "ui-motion",
+      "Microinteracciones, animaciones CSS y transiciones fluidas."
+    ],
+    [
+      "ui-pattern",
+      "Patrones de componentes UI (modales, cards, navbars)."
+    ],
+    [
+      "ui-ux-designer",
+      "Principios de experiencia de usuario y arquitectura de información."
+    ],
+    [
+      "ui-ux-pro-max",
+      "Sistemas de diseño UI/UX avanzados para aplicaciones web."
+    ],
+    [
+      "ux-audit",
+      "Evaluación de usabilidad e interactividad."
+    ],
+    [
+      "ux-copy",
+      "Redacción de microtextos y mensajes de interfaz."
+    ],
+    [
+      "ux-feedback",
+      "Diseño de estados de carga, confirmaciones y mensajes Toast."
+    ],
+    [
+      "ux-flow",
+      "Flujos de interacción SPA y navegación de usuario."
+    ],
+    [
+      "uxui-principles",
+      "Principios fundamentales de diseño UI/UX."
+    ],
+    [
+      "wcag-audit-patterns",
+      "Patrones de cumplimiento WCAG 2.1."
+    ],
+    [
+      "web-design-guidelines",
+      "Guías de diseño web, tipografía y responsive design."
+    ]
+  ],
+  "pruned": [
+    ".gitignore",
+    "README.md",
+    "docx",
+    "expo-tailwind-setup",
+    "javascript-typescript-typescript-scaffold",
+    "modern-javascript-patterns",
+    "n8n-code-javascript",
+    "pdf",
+    "pptx",
+    "workflow- bundlesREADME.md",
+    "workflow_bundles_readme.md",
+    "xlsx"
+  ]
+}

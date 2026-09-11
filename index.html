@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuotin - Control de Gastos en Cuotas</title>
+  
+  <!-- TailwindCSS v3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            fintech: {
+              bg: '#0f172a',
+              card: '#1e293b',
+              accent: '#10b981',
+              accentHover: '#059669',
+              purple: '#8b5cf6',
+              border: '#334155'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    /* Regla de contraste estricto */
+    .force-text-white {
+      color: #ffffff !important;
+    }
+    
+    /* Transiciones suaves */
+    .transition-spa {
+      transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+    }
+    
+    /* Microinteracción de elevación en tarjetas */
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15);
+    }
+
+    /* Ocultar barra de scroll pero mantener funcionalidad */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-emerald-500 selection:text-white transition-colors duration-300">
+
+  <!-- ==================== HEADER / NAVBAR SUPERIOR ==================== -->
+  <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- LOGO -->
+      <a href="#" onclick="navTo('resumen'); return false;" class="flex items-center gap-2.5 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+          <i class="fa-solid fa-credit-card"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-none">Cuotin<span class="text-emerald-500">.</span></span>
+          <span class="text-[10px] font-medium text-slate-500 dark:text-slate-400">Finanzas Inteligentes</span>
+        </div>
+      </a>
+
+      <!-- NAVEGACIÓN DESKTOP -->
+      <nav class="hidden md:flex items-center gap-1 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl border border-slate-200 dark:border-slate-700/50">
+        <button onclick="navTo('resumen')" id="nav-desktop-resumen" class="nav-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-700 shadow-sm">
+          <i class="fa-solid fa-chart-pie mr-1.5"></i>Resumen
+        </button>
+        <button onclick="navTo('agregar')" id="nav-desktop-agregar" class="nav-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
+          <i class="fa-solid fa-circle-plus mr-1.5"></i>Agregar
+        </button>
+      </nav>
+
+      <!-- BOTONES DE ACCIÓN (MÁS INFO & DARK MODE & MÓVIL) -->
+      <div class="flex items-center gap-2">
+        <!-- BOTÓN MÁS INFO -->
+        <button onclick="openModal('modal-info')" title="Más información sobre créditos y derechos" class="px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-info text-emerald-500"></i>
+          <span class="hidden sm:inline">Más Info</span>
+        </button>
+
+        <!-- TOGGLE DARK / LIGHT MODE -->
+        <button onclick="toggleTheme()" id="btn-theme-toggle" title="Cambiar tema claro/oscuro" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center transition-colors border border-slate-200 dark:border-slate-700">
+          <i class="fa-solid fa-moon text-emerald-400 dark:hidden"></i>
+          <i class="fa-solid fa-sun text-amber-400 hidden dark:block"></i>
+        </button>
+
+        <!-- HAMBURGUESA MÓVIL -->
+        <button onclick="toggleMobileMenu()" id="btn-hamburger" class="md:hidden w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center text-lg border border-slate-200 dark:border-slate-700">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- MENÚ HAMBURGUESA MÓVIL DESPLEGABLE -->
+    <div id="mobile-menu" class="hidden md:hidden border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 space-y-2">
+      <button onclick="navTo('resumen'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-3">
+        <i class="fa-solid fa-chart-pie text-emerald-500 w-5"></i>Resumen
+      </button>
+      <button onclick="navTo('agregar'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-xl font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-3">
+        <i class="fa-solid fa-circle-plus text-emerald-500 w-5"></i>Agregar
+      </button>
+    </div>
+  </header>
+
+  <!-- ==================== CONTENIDO PRINCIPAL (SPA CONTAINER) ==================== -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
+
+    <!-- ==================== VISTA PRINCIPAL: RESUMEN MENSUAL DE GASTOS ==================== -->
+    <section id="view-resumen" class="view-section transition-spa">
+      <div class="space-y-6">
+        
+        <!-- CABECERA RESUMEN Y SELECTOR DE MES -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-emerald-500"></i> Resumen de Gastos Mensual
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Control consolidado de cuotas activas, montos a pagar por mes y proyección financiera.</p>
+          </div>
+
+          <!-- SELECTOR DE MES -->
+          <div class="flex items-center gap-2 min-w-[200px]">
+            <label for="select-mes-resumen" class="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">Mes:</label>
+            <div class="relative w-full">
+              <select id="select-mes-resumen" onchange="renderResumen()" class="w-full appearance-none bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white font-bold text-sm rounded-xl px-4 py-2.5 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all cursor-pointer">
+                <option value="1">Enero</option>
+                <option value="2">Febrero</option>
+                <option value="3" selected>Marzo</option>
+                <option value="4">Abril</option>
+                <option value="5">Mayo</option>
+                <option value="6">Junio</option>
+                <option value="7">Julio</option>
+                <option value="8">Agosto</option>
+                <option value="9">Septiembre</option>
+                <option value="10">Octubre</option>
+                <option value="11">Noviembre</option>
+                <option value="12">Diciembre</option>
+              </select>
+              <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- METRICAS DEL MES SELECCIONADO -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          
+          <!-- TARJETA TOTAL A PAGAR -->
+          <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/15 relative overflow-hidden">
+            <div class="absolute -right-4 -bottom-4 opacity-10 text-7xl font-black">
+              <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+            <span class="text-xs font-semibold opacity-90 uppercase tracking-wider force-text-white">Total a Pagar este Mes</span>
+            <div id="metric-total-mes" class="text-3xl font-black mt-1 force-text-white">$0</div>
+            <p class="text-[11px] opacity-80 mt-1 force-text-white" id="metric-mes-nombre">Mes seleccionado</p>
+          </div>
+
+          <!-- TARJETA CANTIDAD DE CUOTAS -->
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Cuotas Activas</span>
+            <div id="metric-cant-cuotas" class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">0 cuotas</div>
+            <p class="text-[11px] text-slate-400 mt-1">Gastos con cuotas vigentes este mes</p>
+          </div>
+
+          <!-- TARJETA DISPONIBILIDAD -->
+          <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Diagnóstico</span>
+            <div id="metric-status" class="text-lg font-bold text-emerald-500 mt-1 flex items-center gap-2">
+              <i class="fa-solid fa-circle-check"></i> <span>Todo organizado</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">Impacto controlado en el presupuesto</p>
+          </div>
+        </div>
+
+        <!-- CONTENEDOR DE 4 ESTADOS UI & LISTA DE GASTOS -->
+        <div>
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fa-solid fa-receipt text-emerald-500"></i> Gastos y Cuotas del Período
+            </h3>
+            <div class="flex items-center gap-2">
+              <!-- BOTÓN DE PRUEBA DEL 4TO ESTADO UI PARA VERIFICACIÓN DOD -->
+              <button onclick="simularErrorUI()" title="Simular 4to Estado UI (Error) según DoD" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-rose-100 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-500 hover:text-rose-500 text-[11px] font-semibold border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-triangle-exclamation text-xs text-amber-500"></i>
+                <span class="hidden sm:inline">Ver Estado Error (DoD)</span>
+              </button>
+              <span id="badge-contador-gastos" class="px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold">0 ítems</span>
+            </div>
+          </div>
+
+          <!-- ⏳ ESTADO UI 1: LOADING (SKELETON COMPACTO FINTECH) -->
+          <div id="state-loading" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="animate-pulse bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-lg w-28"></div>
+                <div class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+              </div>
+              <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+              <div class="h-16 bg-slate-100 dark:bg-slate-900 rounded-xl"></div>
+              <div class="flex justify-between pt-2">
+                <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+                <div class="h-7 bg-slate-200 dark:bg-slate-700 rounded-lg w-24"></div>
+              </div>
+            </div>
+            <div class="animate-pulse bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-lg w-28"></div>
+                <div class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+              </div>
+              <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+              <div class="h-16 bg-slate-100 dark:bg-slate-900 rounded-xl"></div>
+              <div class="flex justify-between pt-2">
+                <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+                <div class="h-7 bg-slate-200 dark:bg-slate-700 rounded-lg w-24"></div>
+              </div>
+            </div>
+            <div class="animate-pulse bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4 hidden lg:block">
+              <div class="flex items-center justify-between">
+                <div class="h-6 bg-slate-200 dark:bg-slate-700 rounded-lg w-28"></div>
+                <div class="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded-lg"></div>
+              </div>
+              <div class="h-5 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+              <div class="h-16 bg-slate-100 dark:bg-slate-900 rounded-xl"></div>
+              <div class="flex justify-between pt-2">
+                <div class="h-4 bg-slate-200 dark:bg-slate-700 rounded w-1/3"></div>
+                <div class="h-7 bg-slate-200 dark:bg-slate-700 rounded-lg w-24"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 📭 ESTADO UI 2: EMPTY STATE (SIN CUOTAS EN ESTE MES) -->
+          <div id="state-empty" class="hidden bg-white dark:bg-slate-800 rounded-2xl p-8 sm:p-12 text-center border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+            <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 mx-auto flex items-center justify-center text-2xl">
+              <i class="fa-solid fa-calendar-minus"></i>
+            </div>
+            <div class="space-y-1">
+              <h4 class="text-lg font-bold text-slate-900 dark:text-white">¡Sin gastos ni cuotas en este mes!</h4>
+              <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">No tenés compras activas a pagar en el mes seleccionado. Podés registrar un nuevo gasto para simular su impacto en tus resúmenes.</p>
+            </div>
+            <button onclick="navTo('agregar')" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm transition-colors force-text-white inline-flex items-center gap-2">
+              <i class="fa-solid fa-plus"></i> Agregar Gasto
+            </button>
+          </div>
+
+          <!-- ❌ ESTADO UI 3: ERROR STATE (MANEJO RESILIENTE SEGÚN DOD) -->
+          <div id="state-error" class="hidden bg-rose-500/10 dark:bg-rose-950/30 rounded-2xl p-8 sm:p-12 text-center border border-rose-500/30 shadow-sm space-y-4">
+            <div class="w-16 h-16 rounded-full bg-rose-500/20 text-rose-500 mx-auto flex items-center justify-center text-2xl">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="space-y-1">
+              <h4 class="text-lg font-bold text-rose-600 dark:text-rose-400">Error en la carga del resumen de gastos</h4>
+              <p class="text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto" id="state-error-desc">No se pudieron recuperar los gastos del período seleccionado debido a un fallo simulado de consistencia de datos.</p>
+            </div>
+            <div class="flex items-center justify-center gap-3 pt-2 flex-wrap">
+              <button onclick="recuperarEstadoNormal()" class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm transition-colors force-text-white inline-flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> Reintentar Carga
+              </button>
+              <button onclick="restaurarDatosMuestra()" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 font-semibold text-sm transition-colors inline-flex items-center gap-2">
+                <i class="fa-solid fa-database"></i> Restaurar Muestra (6 gastos)
+              </button>
+            </div>
+          </div>
+
+          <!-- ✅ ESTADO UI 4: SUCCESS / GRILLA DE GASTOS SIN FOTOS -->
+          <div id="cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- Las tarjetas se renderizan dinámicamente con JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 3: AGREGAR GASTO ==================== -->
+    <section id="view-agregar" class="view-section hidden transition-spa max-w-2xl mx-auto">
+      <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-xl space-y-6">
+        
+        <!-- CABECERA DE LA SECCIÓN -->
+        <div class="border-b border-slate-100 dark:border-slate-700/60 pb-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold mb-2">
+            <i class="fa-solid fa-circle-plus"></i>
+            Nuevo Registro
+          </div>
+          <h2 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-receipt text-emerald-500"></i> Agregar Gasto
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Registrá una nueva compra con tarjeta para calcular automáticamente las cuotas mensuales y sumarla a tu resumen.</p>
+        </div>
+
+        <!-- FORMULARIO EXCLUSIVO: REGISTRAR GASTO EN CUOTAS -->
+        <form id="form-agregar-gasto" onsubmit="handleAgregarGasto(event)" class="space-y-5">
+          
+          <!-- CAMPO 1: NOMBRE DEL GASTO / CONCEPTO -->
+          <div class="space-y-1.5">
+            <label for="input-nombre" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+              Nombre o Concepto del Gasto <span class="text-emerald-500">*</span>
+            </label>
+            <div class="relative">
+              <input type="text" id="input-nombre" required placeholder="ej: Zapatillas Deportivas / Supermercado / TV 50'" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-xl px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-medium">
+              <i class="fa-solid fa-tag absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            </div>
+          </div>
+
+          <!-- CAMPO 2: PRECIO / MONTO TOTAL ($ARS) -->
+          <div class="space-y-1.5">
+            <label for="input-monto" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+              Precio / Monto Total ($ ARS) <span class="text-emerald-500">*</span>
+            </label>
+            <div class="relative">
+              <input type="number" id="input-monto" min="1" step="1" required placeholder="ej: 120000" oninput="calcularVistaPreviaCuota()" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-xl px-4 py-3 pl-10 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-bold">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- CAMPO 3: CANTIDAD DE CUOTAS -->
+            <div class="space-y-1.5">
+              <label for="select-cuotas" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                Cantidad de Cuotas <span class="text-emerald-500">*</span>
+              </label>
+              <div class="relative">
+                <select id="select-cuotas" onchange="calcularVistaPreviaCuota()" class="w-full appearance-none bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-semibold cursor-pointer">
+                  <option value="1">1 cuota (Pago único)</option>
+                  <option value="3">3 cuotas</option>
+                  <option value="6" selected>6 cuotas</option>
+                  <option value="9">9 cuotas</option>
+                  <option value="12">12 cuotas</option>
+                  <option value="18">18 cuotas</option>
+                  <option value="24">24 cuotas</option>
+                </select>
+                <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+              </div>
+            </div>
+
+            <!-- CAMPO 4: MES DE INICIO -->
+            <div class="space-y-1.5">
+              <label for="select-mes-inicio" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                Mes de Inicio (1ra Cuota) <span class="text-emerald-500">*</span>
+              </label>
+              <div class="relative">
+                <select id="select-mes-inicio" class="w-full appearance-none bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-semibold cursor-pointer">
+                  <option value="1">Enero</option>
+                  <option value="2">Febrero</option>
+                  <option value="3" selected>Marzo</option>
+                  <option value="4">Abril</option>
+                  <option value="5">Mayo</option>
+                  <option value="6">Junio</option>
+                  <option value="7">Julio</option>
+                  <option value="8">Agosto</option>
+                  <option value="9">Septiembre</option>
+                  <option value="10">Octubre</option>
+                  <option value="11">Noviembre</option>
+                  <option value="12">Diciembre</option>
+                </select>
+                <i class="fa-solid fa-calendar-days absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- CAMPO 5: CATEGORÍA DEL GASTO -->
+          <div class="space-y-1.5">
+            <label for="select-categoria" class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+              Categoría del Gasto <span class="text-emerald-500">*</span>
+            </label>
+            <div class="relative">
+              <select id="select-categoria" class="w-full appearance-none bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-semibold cursor-pointer">
+                <option value="Supermercado">🛒 Supermercado y Alimentos</option>
+                <option value="Tecnología">💻 Tecnología y Electro</option>
+                <option value="Indumentaria">👟 Indumentaria y Calzado</option>
+                <option value="Hogar">🏠 Hogar y Mantenimiento</option>
+                <option value="Viajes">✈️ Viajes y Turismo</option>
+                <option value="Varios" selected>📦 Varios y Otros</option>
+              </select>
+              <i class="fa-solid fa-chevron-down absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- CUADRO VISTA PREVIA CÁLCULO DE CUOTA -->
+          <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+            <div>
+              <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Cuota Mensual Estimada</span>
+              <div id="preview-cuota-valor" class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">$0 / mes</div>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center text-xl">
+              <i class="fa-solid fa-calculator"></i>
+            </div>
+          </div>
+
+          <!-- BOTÓN DE ACCIÓN CON ANIMACIÓN -->
+          <button type="submit" id="btn-submit-gasto" class="w-full py-4 px-6 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-98 text-white font-extrabold text-base shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-all flex items-center justify-center gap-2 force-text-white cursor-pointer">
+            <i class="fa-solid fa-circle-plus"></i> <span>Agregar Gasto</span>
+          </button>
+        </form>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL 1: MÁS INFO (CRÉDITOS Y DERECHOS) ==================== -->
+  <div id="modal-info" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-2xl space-y-5 relative max-h-[90vh] overflow-y-auto">
+      
+      <button onclick="closeModal('modal-info')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center text-sm transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center gap-3 border-b border-slate-100 dark:border-slate-700/60 pb-4">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl font-bold">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-extrabold text-slate-900 dark:text-white">Sobre Cuotin</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Información del proyecto y derechos de usuario</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+        <p>
+          <strong class="text-slate-900 dark:text-white">Cuotin</strong> es un simulador pedagógico de finanzas personales diseñado para ayudar a usuarios argentinos a proyectar el valor mensual de sus tarjetas de crédito cuando realizan compras en cuotas.
+        </p>
+
+        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 space-y-2 text-xs">
+          <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-lock text-emerald-500"></i> Privacidad y Almacenamiento Local
+          </div>
+          <p>Tus datos financieros residen **exclusivamente en tu navegador** (`localStorage`). No enviamos información a servidores externos ni requerimos registro.</p>
+        </div>
+
+        <div class="space-y-1 text-xs">
+          <h4 class="font-bold text-slate-900 dark:text-white">Consejos para comprar en cuotas:</h4>
+          <ul class="list-disc pl-5 space-y-1 text-slate-500 dark:text-slate-400">
+            <li>Verificá siempre si la cuota es fija o tiene interés acumulado (CFT).</li>
+            <li>No comprometas más del 30% de tus ingresos en resúmenes de tarjeta.</li>
+            <li>Revisá en qué mes inicia la primera cuota para no encimarla con otros gastos.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-slate-100 dark:border-slate-700/60 pt-4 flex items-center justify-between text-xs text-slate-400">
+        <span>Cuotin v1.0 • 2026</span>
+        <button onclick="closeModal('modal-info')" class="px-5 py-2 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-colors force-text-white">
+          Entendido
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: DETALLE DEL GASTO (POPUP) ==================== -->
+  <div id="modal-detalle" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm transition-opacity">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-2xl space-y-5 relative">
+      
+      <button onclick="closeModal('modal-detalle')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-500 hover:text-slate-800 dark:hover:text-white flex items-center justify-center text-sm transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- ENCABEZADO CON CATEGORÍA Y BADGE (SIN IMÁGENES) -->
+      <div class="flex items-center gap-3.5 border-b border-slate-100 dark:border-slate-700/60 pb-4">
+        <div id="modal-det-icon-container" class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xl font-bold">
+          <i id="modal-det-icon" class="fa-solid fa-receipt"></i>
+        </div>
+        <div>
+          <span id="modal-det-categoria" class="inline-block px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-bold uppercase tracking-wider mb-1">Categoría</span>
+          <h3 id="modal-det-titulo" class="text-xl font-extrabold text-slate-900 dark:text-white leading-tight">Nombre del Gasto</h3>
+        </div>
+      </div>
+
+      <!-- DETALLES TÉCNICOS FINANCIEROS -->
+      <div class="grid grid-cols-2 gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs">
+        <div>
+          <span class="text-slate-400 block font-medium">Precio / Total</span>
+          <span id="modal-det-total" class="font-extrabold text-slate-900 dark:text-white text-sm">$0</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block font-medium">Cuota Mensual</span>
+          <span id="modal-det-cuota-val" class="font-extrabold text-emerald-500 text-sm">$0</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block font-medium">Plan de Pagos</span>
+          <span id="modal-det-cuotas-plan" class="font-bold text-slate-800 dark:text-slate-200">0 cuotas</span>
+        </div>
+        <div>
+          <span class="text-slate-400 block font-medium">Mes de Inicio</span>
+          <span id="modal-det-mes-inicio" class="font-bold text-slate-800 dark:text-slate-200">Mes</span>
+        </div>
+      </div>
+
+      <!-- DESGLOSE DE MESES VIGENTES -->
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Período de impacto en resúmenes:</h4>
+        <div id="modal-det-lista-meses" class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto no-scrollbar">
+          <!-- Badges de meses renderizados con JS -->
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <button onclick="closeModal('modal-detalle')" class="w-full py-3 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-bold text-sm transition-colors cursor-pointer">
+          Cerrar detalle
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== CONTENEDOR TOAST NOTIFICACIONES ==================== -->
+  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none">
+    <!-- Toasts dinámicos renderizados por JS -->
+  </div>
+
+  <!-- ==================== BARRA DE NAVEGACIÓN INFERIOR (BOTTOM NAV BAR MÓVIL) ==================== -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-6 py-2">
+    <div class="flex items-center justify-around">
+      
+      <button onclick="navTo('resumen')" id="nav-bottom-resumen" class="nav-btn flex flex-col items-center gap-1 text-emerald-500 font-bold text-xs">
+        <i class="fa-solid fa-chart-pie text-lg"></i>
+        <span>Resumen</span>
+      </button>
+
+      <button onclick="navTo('agregar')" id="nav-bottom-agregar" class="nav-btn flex flex-col items-center gap-1 text-slate-400 font-medium text-xs hover:text-slate-700 dark:hover:text-slate-200">
+        <i class="fa-solid fa-circle-plus text-lg"></i>
+        <span>Agregar</span>
+      </button>
+
+      <button onclick="openModal('modal-info')" class="flex flex-col items-center gap-1 text-slate-400 font-medium text-xs hover:text-slate-700 dark:hover:text-slate-200">
+        <i class="fa-solid fa-circle-info text-lg"></i>
+        <span>Info</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ==================== LOGICA JAVASCRIPT VANILLA ==================== -->
+  <script>
+    // Nombres de los meses del año
+    const MESES = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    // Iconos según categoría
+    const CATEGORIA_ICONS = {
+      "Indumentaria": "fa-shoe-prints text-purple-500 bg-purple-500/10",
+      "Tecnología": "fa-tv text-blue-500 bg-blue-500/10",
+      "Supermercado": "fa-cart-shopping text-emerald-500 bg-emerald-500/10",
+      "Hogar": "fa-house-laptop text-amber-500 bg-amber-500/10",
+      "Viajes": "fa-plane-departure text-sky-500 bg-sky-500/10",
+      "Varios": "fa-bag-shopping text-rose-500 bg-rose-500/10"
+    };
+
+    // Datos iniciales de muestra (6 gastos maquetados sin imágenes)
+    const INITIAL_GASTOS = [
+      {
+        id: "1",
+        nombre: "Zapatillas Deportivas Nike Air",
+        montoTotal: 120000,
+        cuotas: 6,
+        mesInicio: 1,
+        categoria: "Indumentaria"
+      },
+      {
+        id: "2",
+        nombre: "Smart TV 50' 4K UHD Samsung",
+        montoTotal: 480000,
+        cuotas: 12,
+        mesInicio: 1,
+        categoria: "Tecnología"
+      },
+      {
+        id: "3",
+        nombre: "Compra Mayorista Supermercado",
+        montoTotal: 450000,
+        cuotas: 3,
+        mesInicio: 2,
+        categoria: "Supermercado"
+      },
+      {
+        id: "4",
+        nombre: "Vuelo Ida y Vuelta a Bariloche",
+        montoTotal: 270000,
+        cuotas: 6,
+        mesInicio: 3,
+        categoria: "Viajes"
+      },
+      {
+        id: "5",
+        nombre: "Service Integral del Auto y Frenos",
+        montoTotal: 180000,
+        cuotas: 3,
+        mesInicio: 1,
+        categoria: "Hogar"
+      },
+      {
+        id: "6",
+        nombre: "Cafetera Espresso Automática",
+        montoTotal: 96000,
+        cuotas: 3,
+        mesInicio: 2,
+        categoria: "Hogar"
+      }
+    ];
+
+    // --- GESTIÓN DE ALMACENAMIENTO LOCAL ---
+    function getGastos() {
+      const data = localStorage.getItem('cuotin_gastos');
+      if (!data) {
+        localStorage.setItem('cuotin_gastos', JSON.stringify(INITIAL_GASTOS));
+        return INITIAL_GASTOS;
+      }
+      try {
+        const parsed = JSON.parse(data);
+        if (!Array.isArray(parsed) || parsed.length === 0) {
+          localStorage.setItem('cuotin_gastos', JSON.stringify(INITIAL_GASTOS));
+          return INITIAL_GASTOS;
+        }
+        return parsed;
+      } catch (e) {
+        localStorage.setItem('cuotin_gastos', JSON.stringify(INITIAL_GASTOS));
+        return INITIAL_GASTOS;
+      }
+    }
+
+    function saveGastos(gastos) {
+      localStorage.setItem('cuotin_gastos', JSON.stringify(gastos));
+    }
+
+    // --- NAVEGACIÓN SPA ENTRE VISTAS ---
+    function navTo(viewId) {
+      const views = ['resumen', 'agregar'];
+      
+      views.forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        if (viewEl) {
+          if (v === viewId) {
+            viewEl.classList.remove('hidden');
+          } else {
+            viewEl.classList.add('hidden');
+          }
+        }
+      });
+
+      // Actualizar estado activo en botones desktop y bottom bar
+      views.forEach(v => {
+        const btnDesktop = document.getElementById(`nav-desktop-${v}`);
+        const btnBottom = document.getElementById(`nav-bottom-${v}`);
+        
+        if (v === viewId) {
+          if (btnDesktop) btnDesktop.className = "nav-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-emerald-600 dark:text-emerald-400 bg-white dark:bg-slate-700 shadow-sm";
+          if (btnBottom) btnBottom.className = "nav-btn flex flex-col items-center gap-1 text-emerald-500 font-bold text-xs";
+        } else {
+          if (btnDesktop) btnDesktop.className = "nav-btn px-4 py-2 text-sm font-semibold rounded-lg transition-all text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white";
+          if (btnBottom) btnBottom.className = "nav-btn flex flex-col items-center gap-1 text-slate-400 font-medium text-xs hover:text-slate-700 dark:hover:text-slate-200";
+        }
+      });
+
+      // Si navega a resumen, renderizar la vista
+      if (viewId === 'resumen') {
+        renderResumen();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // --- TOGGLE MODO CLARO / OSCURO ---
+    function toggleTheme() {
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        localStorage.setItem('cuotin_theme', 'light');
+      } else {
+        html.classList.add('dark');
+        localStorage.setItem('cuotin_theme', 'dark');
+      }
+    }
+
+    // Cargar tema guardado
+    (function initTheme() {
+      const savedTheme = localStorage.getItem('cuotin_theme');
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+
+    // --- CÁLCULO DE CUOTAS Y RENDERIZADO DEL RESUMEN ---
+    function renderResumen() {
+      const selectMes = document.getElementById('select-mes-resumen');
+      const mesSel = parseInt(selectMes.value, 10);
+      const nombreMes = MESES[mesSel - 1];
+
+      document.getElementById('metric-mes-nombre').textContent = `En el mes de ${nombreMes}`;
+
+      const stateLoading = document.getElementById('state-loading');
+      const stateEmpty = document.getElementById('state-empty');
+      const stateError = document.getElementById('state-error');
+      const cardsGrid = document.getElementById('cards-grid');
+
+      // ⏳ Mostrar Loading brevemente
+      stateLoading.classList.remove('hidden');
+      cardsGrid.innerHTML = '';
+      stateEmpty.classList.add('hidden');
+      if (stateError) stateError.classList.add('hidden');
+
+      setTimeout(() => {
+        stateLoading.classList.add('hidden');
+
+        const gastos = getGastos();
+        let totalMes = 0;
+        let cuotasActivas = 0;
+        const gastosMes = [];
+
+        gastos.forEach(gasto => {
+          // El rango de meses activos para un gasto
+          const inicio = gasto.mesInicio;
+          const fin = inicio + gasto.cuotas - 1;
+
+          let cuotaNumero = -1;
+
+          if (mesSel >= inicio && mesSel <= fin) {
+            cuotaNumero = (mesSel - inicio) + 1;
+          } else if (fin > 12) {
+            // Manejo de ciclo anual de meses (1 a 12)
+            const finAjustado = fin - 12;
+            if (mesSel <= finAjustado) {
+              cuotaNumero = (12 - inicio + 1) + mesSel;
+            }
+          }
+
+          if (cuotaNumero > 0 && cuotaNumero <= gasto.cuotas) {
+            const valorCuota = Math.round(gasto.montoTotal / gasto.cuotas);
+            totalMes += valorCuota;
+            cuotasActivas++;
+            gastosMes.push({
+              ...gasto,
+              cuotaActual: cuotaNumero,
+              valorCuota: valorCuota
+            });
+          }
+        });
+
+        // Actualizar métricas generales
+        document.getElementById('metric-total-mes').textContent = `$${totalMes.toLocaleString('es-AR')}`;
+        document.getElementById('metric-cant-cuotas').textContent = `${cuotasActivas} ${cuotasActivas === 1 ? 'cuota' : 'cuotas'}`;
+        document.getElementById('badge-contador-gastos').textContent = `${cuotasActivas} ${cuotasActivas === 1 ? 'ítem' : 'ítems'}`;
+
+        const metricStatus = document.getElementById('metric-status');
+        if (totalMes > 300000) {
+          metricStatus.className = "text-lg font-bold text-amber-500 mt-1 flex items-center gap-2";
+          metricStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> <span>Resumen elevado</span>`;
+        } else {
+          metricStatus.className = "text-lg font-bold text-emerald-500 mt-1 flex items-center gap-2";
+          metricStatus.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Presupuesto saludable</span>`;
+        }
+
+        // 📭 Si no hay cuotas en este mes (Empty state)
+        if (gastosMes.length === 0) {
+          stateEmpty.classList.remove('hidden');
+          return;
+        }
+
+        // ✅ Renderizar tarjetas de gastos en la grilla (diseño financiero limpio sin imágenes)
+        gastosMes.forEach(gasto => {
+          const iconInfo = CATEGORIA_ICONS[gasto.categoria] || CATEGORIA_ICONS['Varios'];
+          const parts = iconInfo.split(' ');
+          const faIcon = parts[0];
+          const colorText = parts[1];
+          const bgClass = parts[2];
+          
+          const cardHtml = `
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm card-hover flex flex-col justify-between space-y-4 group">
+              
+              <!-- CABECERA: CATEGORÍA Y ACCIÓN ELIMINAR -->
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-xl ${bgClass} ${colorText} flex items-center justify-center text-lg shrink-0">
+                    <i class="fa-solid ${faIcon}"></i>
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block leading-tight">${gasto.categoria}</span>
+                    <h4 class="font-extrabold text-slate-900 dark:text-white text-base leading-tight mt-0.5">${gasto.nombre}</h4>
+                  </div>
+                </div>
+                <button onclick="eliminarGasto('${gasto.id}')" title="Eliminar gasto" class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700/60 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center justify-center transition-colors shrink-0 cursor-pointer">
+                  <i class="fa-solid fa-trash-can text-xs"></i>
+                </button>
+              </div>
+
+              <!-- DETALLE DE CUOTA DEL MES Y AVANCE -->
+              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-700/50 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Cuota (${nombreMes})</span>
+                  <span class="text-xl font-black text-emerald-500">$${gasto.valorCuota.toLocaleString('es-AR')}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-200/60 dark:border-slate-700/40">
+                  <span class="text-slate-400 font-medium">Progreso del plan</span>
+                  <span class="font-bold text-slate-700 dark:text-slate-200">Cuota ${gasto.cuotaActual} de ${gasto.cuotas}</span>
+                </div>
+              </div>
+
+              <!-- PIE TARJETA CON PRECIO TOTAL Y BOTÓN VER DETALLES -->
+              <div class="flex items-center justify-between border-t border-slate-100 dark:border-slate-700/60 pt-3 text-xs">
+                <div>
+                  <span class="text-[10px] text-slate-400 block font-medium uppercase">Precio Total</span>
+                  <strong class="text-slate-800 dark:text-slate-200 text-sm">$${gasto.montoTotal.toLocaleString('es-AR')}</strong>
+                </div>
+                <button onclick="openDetalleModal('${gasto.id}')" class="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 text-slate-700 dark:text-slate-200 font-bold transition-all flex items-center gap-1.5 cursor-pointer">
+                  <i class="fa-solid fa-circle-info text-xs"></i> Desglose
+                </button>
+              </div>
+            </div>
+          `;
+
+          cardsGrid.insertAdjacentHTML('beforeend', cardHtml);
+        });
+
+      }, 150);
+    }
+
+    // --- CÁLCULO DE VISTA PREVIA EN FORMULARIO ---
+    function calcularVistaPreviaCuota() {
+      const inputMonto = document.getElementById('input-monto');
+      const selectCuotas = document.getElementById('select-cuotas');
+      const previewVal = document.getElementById('preview-cuota-valor');
+
+      const monto = parseFloat(inputMonto.value) || 0;
+      const cuotas = parseInt(selectCuotas.value, 10) || 1;
+
+      if (monto > 0) {
+        const valorCuota = Math.round(monto / cuotas);
+        previewVal.textContent = `$${valorCuota.toLocaleString('es-AR')} / mes`;
+      } else {
+        previewVal.textContent = `$0 / mes`;
+      }
+    }
+
+    // --- ALTA DE NUEVO GASTO ---
+    function handleAgregarGasto(e) {
+      e.preventDefault();
+
+      const btnSubmit = document.getElementById('btn-submit-gasto');
+      const nombre = document.getElementById('input-nombre').value.trim();
+      const montoTotal = parseFloat(document.getElementById('input-monto').value);
+      const cuotas = parseInt(document.getElementById('select-cuotas').value, 10);
+      const mesInicio = parseInt(document.getElementById('select-mes-inicio').value, 10);
+      const categoria = document.getElementById('select-categoria').value;
+
+      if (!nombre || isNaN(montoTotal) || montoTotal <= 0) {
+        alert("Por favor completá los campos obligatorios con valores válidos.");
+        return;
+      }
+
+      // Animación feedback en botón
+      btnSubmit.classList.add('scale-95', 'opacity-80');
+      btnSubmit.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>Guardando...</span>`;
+
+      setTimeout(() => {
+        const nuevoGasto = {
+          id: Date.now().toString(),
+          nombre: nombre,
+          montoTotal: montoTotal,
+          cuotas: cuotas,
+          mesInicio: mesInicio,
+          categoria: categoria
+        };
+
+        const gastos = getGastos();
+        gastos.push(nuevoGasto);
+        saveGastos(gastos);
+
+        // Resetear formulario
+        document.getElementById('form-agregar-gasto').reset();
+        calcularVistaPreviaCuota();
+
+        btnSubmit.classList.remove('scale-95', 'opacity-80');
+        btnSubmit.innerHTML = `<i class="fa-solid fa-check"></i> <span>Agregar Gasto a Cuotin</span>`;
+
+        // Notificación Toast Verde
+        showToast(`¡"${nombre}" se agregó correctamente!`);
+
+        // Cambiar a la vista de resumen
+        navTo('resumen');
+      }, 300);
+    }
+
+    // --- ELIMINAR GASTO ---
+    function eliminarGasto(id) {
+      if (confirm("¿Estás seguro de eliminar este gasto de tu lista?")) {
+        let gastos = getGastos();
+        gastos = gastos.filter(g => g.id !== id);
+        saveGastos(gastos);
+        renderResumen();
+        showToast("Gasto eliminado correctamente.");
+      }
+    }
+
+    // --- MODALES (MÁS INFO Y VER DETALLES) ---
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function openDetalleModal(gastoId) {
+      const gastos = getGastos();
+      const gasto = gastos.find(g => g.id === gastoId);
+      if (!gasto) return;
+
+      const valorCuota = Math.round(gasto.montoTotal / gasto.cuotas);
+
+      document.getElementById('modal-det-titulo').textContent = gasto.nombre;
+      document.getElementById('modal-det-categoria').textContent = gasto.categoria;
+      document.getElementById('modal-det-total').textContent = `$${gasto.montoTotal.toLocaleString('es-AR')}`;
+      document.getElementById('modal-det-cuota-val').textContent = `$${valorCuota.toLocaleString('es-AR')}`;
+      document.getElementById('modal-det-cuotas-plan').textContent = `${gasto.cuotas} ${gasto.cuotas === 1 ? 'cuota' : 'cuotas'}`;
+      document.getElementById('modal-det-mes-inicio').textContent = MESES[gasto.mesInicio - 1];
+
+      // Icono y color según categoría
+      const iconInfo = CATEGORIA_ICONS[gasto.categoria] || CATEGORIA_ICONS['Varios'];
+      const parts = iconInfo.split(' ');
+      const faIcon = parts[0];
+      const colorText = parts[1];
+      const bgClass = parts[2];
+
+      const iconEl = document.getElementById('modal-det-icon');
+      const containerIcon = document.getElementById('modal-det-icon-container');
+      if (iconEl && containerIcon) {
+        iconEl.className = `fa-solid ${faIcon}`;
+        containerIcon.className = `w-12 h-12 rounded-2xl ${bgClass} ${colorText} flex items-center justify-center text-xl font-bold`;
+      }
+
+      // Lista de meses impactados
+      const contenedorMeses = document.getElementById('modal-det-lista-meses');
+      contenedorMeses.innerHTML = '';
+
+      for (let i = 0; i < gasto.cuotas; i++) {
+        let mesIdx = (gasto.mesInicio - 1 + i) % 12;
+        const nombreM = MESES[mesIdx];
+        const badge = document.createElement('span');
+        badge.className = "px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] border border-emerald-500/20";
+        badge.textContent = `Cuota ${i+1}: ${nombreM}`;
+        contenedorMeses.appendChild(badge);
+      }
+
+      openModal('modal-detalle');
+    }
+
+    // --- SIMULACIÓN Y CONTROL DE LOS 4 ESTADOS UI (DOD) ---
+    function simularErrorUI() {
+      const stateLoading = document.getElementById('state-loading');
+      const stateEmpty = document.getElementById('state-empty');
+      const stateError = document.getElementById('state-error');
+      const cardsGrid = document.getElementById('cards-grid');
+      const badge = document.getElementById('badge-contador-gastos');
+
+      stateLoading.classList.add('hidden');
+      stateEmpty.classList.add('hidden');
+      cardsGrid.innerHTML = '';
+      stateError.classList.remove('hidden');
+      badge.textContent = "Error DoD";
+      badge.className = "px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-500 text-xs font-bold";
+
+      showToast("Visualizando 4to Estado UI (Error) para verificación del DoD.");
+    }
+
+    function recuperarEstadoNormal() {
+      const stateError = document.getElementById('state-error');
+      if (stateError) stateError.classList.add('hidden');
+      const badge = document.getElementById('badge-contador-gastos');
+      badge.className = "px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold";
+      renderResumen();
+      showToast("Resumen de gastos recuperado exitosamente.");
+    }
+
+    function restaurarDatosMuestra() {
+      localStorage.setItem('cuotin_gastos', JSON.stringify(INITIAL_GASTOS));
+      recuperarEstadoNormal();
+      showToast("Muestra de 6 gastos restaurada.");
+    }
+
+    // Listener para cerrar modales al hacer clic en el backdrop oscuro o presionar ESC
+    window.addEventListener('click', (e) => {
+      if (e.target.id === 'modal-info') closeModal('modal-info');
+      if (e.target.id === 'modal-detalle') closeModal('modal-detalle');
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeModal('modal-info');
+        closeModal('modal-detalle');
+      }
+    });
+
+    // --- NOTIFICACIONES TOAST (VERDE EXITO) ---
+    function showToast(mensaje) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      toast.className = "px-4 py-3 rounded-2xl bg-slate-900 text-white border border-emerald-500/50 shadow-2xl flex items-center gap-3 text-xs font-bold transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto force-text-white";
+      toast.innerHTML = `
+        <div class="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <span>${mensaje}</span>
+      `;
+
+      container.appendChild(toast);
+
+      // Animar entrada
+      setTimeout(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+      }, 50);
+
+      // Salida automática
+      setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // --- INICIALIZACIÓN ---
+    document.addEventListener('DOMContentLoaded', () => {
+      renderResumen();
+      calcularVistaPreviaCuota();
+    });
+  </script>
+</body>
+</html>

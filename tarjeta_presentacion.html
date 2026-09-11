@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarjeta de Presentación - Tema Oscuro & Gradiente Violeta</title>
+  <style>
+    /* Reset & Custom Properties */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-dark: #0a0814;
+      --card-bg: rgba(22, 18, 41, 0.85);
+      --card-border: rgba(168, 85, 247, 0.25);
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --accent-violet: #a855f7;
+      --accent-violet-light: #c084fc;
+      --accent-violet-dark: #7c3aed;
+      --gradient-violet: linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #c084fc 100%);
+      --gradient-btn: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      --gradient-btn-hover: linear-gradient(135deg, #6d28d9 0%, #9333ea 100%);
+      --shadow-glow: 0 0 25px rgba(124, 58, 237, 0.35);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(192, 132, 252, 0.1) 0%, transparent 40%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Container Card - HTML5 Article */
+    .profile-card {
+      width: 100%;
+      max-width: 380px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), var(--shadow-glow);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    }
+
+    .profile-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(168, 85, 247, 0.45);
+    }
+
+    /* Header & Banner */
+    .card-banner {
+      height: 110px;
+      background: var(--gradient-violet);
+      position: relative;
+    }
+
+    .card-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 40%, var(--card-bg) 100%);
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: -50px auto 0;
+      z-index: 2;
+    }
+
+    .avatar-container {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      padding: 3px;
+      background: var(--gradient-violet);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #161229;
+      display: block;
+    }
+
+    .status-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      width: 16px;
+      height: 16px;
+      background-color: #10b981;
+      border: 3px solid #161229;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+    }
+
+    /* Card Content / Body */
+    .card-body {
+      padding: 20px 28px 24px;
+      text-align: center;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .profile-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent-violet-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .profile-bio {
+      font-size: 0.925rem;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    /* Skills list */
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      list-style: none;
+      margin-bottom: 24px;
+    }
+
+    .skill-tag {
+      font-size: 0.775rem;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(124, 58, 237, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      color: #e9d5ff;
+      transition: all 0.25s ease;
+    }
+
+    .skill-tag:hover {
+      background: rgba(124, 58, 237, 0.25);
+      border-color: rgba(192, 132, 252, 0.5);
+      transform: scale(1.04);
+    }
+
+    /* Stats Section */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 14px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      margin-bottom: 24px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-number {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-label {
+      font-size: 0.725rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Footer & Hover Button */
+    .card-footer {
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-action {
+      position: relative;
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ffffff;
+      background: var(--gradient-btn);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Hover effect: Glow, Translate & Scale */
+    .btn-action:hover {
+      background: var(--gradient-btn-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.6), 0 0 15px rgba(192, 132, 252, 0.5);
+    }
+
+    .btn-action:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 10px rgba(124, 58, 237, 0.4);
+    }
+
+    /* Light streak effect on hover */
+    .btn-action::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.25), 
+        transparent
+      );
+      transition: left 0.6s ease;
+    }
+
+    .btn-action:hover::before {
+      left: 140%;
+    }
+
+    .btn-icon {
+      transition: transform 0.3s ease;
+    }
+
+    .btn-action:hover .btn-icon {
+      transform: translateX(4px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Componente de Tarjeta de Presentación Semántico (HTML5) -->
+  <article class="profile-card">
+    <div class="card-banner" aria-hidden="true"></div>
+    
+    <div class="avatar-wrapper">
+      <figure class="avatar-container">
+        <img 
+          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" 
+          alt="Foto de perfil de Sofía Valenzuela" 
+          class="avatar-img"
+        >
+      </figure>
+      <span class="status-badge" title="Disponible para trabajar"></span>
+    </div>
+
+    <div class="card-body">
+      <header>
+        <h1 class="profile-name">Sofía Valenzuela</h1>
+        <p class="profile-title">UX/UI & Senior Frontend Developer</p>
+      </header>
+
+      <p class="profile-bio">
+        Apasionada por crear experiencias digitales accesibles, fluidas e innovadoras. Especialista en diseño de interfaz y desarrollo web con estándares modernos.
+      </p>
+
+      <ul class="skills-list" aria-label="Habilidades principales">
+        <li class="skill-tag">HTML5 / CSS3</li>
+        <li class="skill-tag">JavaScript</li>
+        <li class="skill-tag">React</li>
+        <li class="skill-tag">UI/UX Design</li>
+      </ul>
+
+      <section class="stats-container" aria-label="Estadísticas profesionales">
+        <div class="stat-item">
+          <span class="stat-number">6+</span>
+          <span class="stat-label">Años Exp.</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">45+</span>
+          <span class="stat-label">Proyectos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">99%</span>
+          <span class="stat-label">Feedback</span>
+        </div>
+      </section>
+
+      <footer class="card-footer">
+        <button type="button" class="btn-action">
+          <span>Contactar ahora</span>
+          <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </footer>
+    </div>
+  </article>
+
+</body>
+</html>
